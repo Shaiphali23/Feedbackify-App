@@ -1,0 +1,112 @@
+import { Button, TextField, Link } from "@mui/material";
+import { useForm } from "react-hook-form";
+import AuthForm from "./AuthForm";
+import { useNavigate } from "react-router-dom";
+import Typography from "@mui/material/Typography";
+import { useState } from "react";
+import { toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useAuth } from "../ContextAPI/authContext";
+
+const Login = () => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm();
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const API_BASE_URL = process.env.REACT_APP_API_URL;
+  const navigate = useNavigate();
+  const { login } = useAuth();
+
+  const onSubmit = async (data) => {
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      let responseData;
+      try {
+        responseData = await response.json();
+        // console.log("Response data:", responseData);
+      } catch (e) {
+        console.log("Failed to parse JSON response:", e);
+      }
+
+      if (!response.ok) {
+        throw new Error(
+          responseData?.message || `Login failed (HTTP ${response.status})`
+        );
+      }
+
+      login(responseData);
+      toast.success("Login successful!");
+      reset();
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Full error:", error);
+      toast.error(error.message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <AuthForm title="Login">
+      <>
+        <ToastContainer position="top-center" autoClose={3000} />
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <TextField
+            label="Email"
+            type="email"
+            fullWidth
+            margin="normal"
+            {...register("email", { required: "Email is required" })}
+            error={!!errors.email}
+            helperText={errors.email?.message}
+          />
+          <TextField
+            label="Password"
+            type="password"
+            fullWidth
+            margin="normal"
+            {...register("password", {
+              required: "Password is required",
+              minLength: { value: 6, message: "Minimum 6 characters" },
+            })}
+            error={!!errors.password}
+            helperText={errors.password?.message}
+          />
+
+          <Button
+            type="submit"
+            variant="contained"
+            fullWidth
+            sx={{ mt: 2 }}
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Signing In..." : "Login"}
+          </Button>
+
+          <Typography sx={{ mt: 2, textAlign: "center" }}>
+            Don't have an account?{" "}
+            <Link href="/signup" underline="hover">
+              Sign up
+            </Link>
+          </Typography>
+        </form>
+      </>
+    </AuthForm>
+  );
+};
+
+export default Login;
