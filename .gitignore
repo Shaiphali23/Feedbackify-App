@@ -1,0 +1,12 @@
+# Frontend
+frontend/node_modules/
+frontend/.env*
+frontend/.env.local*
+
+# Backend 
+backend/node_modules/
+backend/.env*
+backend/.env.local*
+
+# Global (if any)
+node_modules/
