@@ -6,6 +6,7 @@ import Dashboard from "./components/Dashboard";
 import ProtectedRoute from "./ContextAPI/ProtectedRoute";
 import FeedbackForm from "./components/FeedbackForm";
 import FeedbackList from "./components/FeedbackList";
+import FeedbackChart from "./components/FeedbackChart";
 
 function App() {
   return (

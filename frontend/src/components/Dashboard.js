@@ -17,14 +17,43 @@ import {
   ListItem,
   ListItemText,
   Paper,
+  Chip,
+  useTheme,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
+import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import { useAuth } from "../ContextAPI/authContext";
 import FeedbackChart from "./FeedbackChart";
 import FeedbackList from "./FeedbackList";
+import AddIcon from "@mui/icons-material/Add";
+import { styled } from "@mui/material/styles";
+
+const SubmitButton = styled(Button)(({ theme }) => ({
+  marginTop: theme.spacing(3),
+  padding: theme.spacing(1.5),
+  fontWeight: "bold",
+  background: `linear-gradient(45deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
+  "&:hover": {
+    transform: "translateY(-2px)",
+    boxShadow: theme.shadows[4],
+  },
+  transition: "all 0.3s ease",
+}));
+const RefreshButton = styled(Button)(({ theme }) => ({
+  marginTop: theme.spacing(3),
+  padding: theme.spacing(1.5),
+  fontWeight: "bold",
+  background: `linear-gradient(45deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
+  "&:hover": {
+    transform: "translateY(-2px)",
+    boxShadow: theme.shadows[4],
+  },
+  transition: "all 0.3s ease",
+}));
 
 export default function MenuAppBar() {
+  const theme = useTheme();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
@@ -133,25 +162,56 @@ export default function MenuAppBar() {
   }, [user, fetchFeedback, refreshCount]);
 
   return (
-    <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static">
-        <Toolbar>
-          <IconButton size="large" edge="start" color="inherit" sx={{ mr: 2 }}>
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Dashboard
-          </Typography>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        minHeight: "100vh",
+        backgroundColor: theme.palette.background.default,
+      }}
+    >
+      <AppBar
+        position="sticky"
+        elevation={1}
+        sx={{ backgroundColor: theme.palette.background.paper }}
+      >
+        <Toolbar sx={{ justifyContent: "space-between" }}>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <IconButton size="large" edge="start" sx={{ mr: 2 }}>
+              <MenuIcon />
+            </IconButton>
+            <Typography
+              variant="h6"
+              component="div"
+              sx={{ fontWeight: 700, color: theme.palette.text.primary }}
+            >
+              Feedback Dashboard
+            </Typography>
+          </Box>
 
           {user && (
-            <div>
-              <IconButton onClick={handleMenu} color="inherit" sx={{ p: 0.5 }}>
+            <Box sx={{ display: "flex", alignItems: "center" }}>
+              <Chip
+                label={user.name || user.email || "User"}
+                sx={{ mr: 2, fontWeight: 600 }}
+                avatar={
+                  <Avatar
+                    sx={{ bgcolor: theme.palette.primary.main }}
+                    alt={user.name || user.email || "User"}
+                    src={`https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(
+                      user.name || user.email || "User"
+                    )}`}
+                  />
+                }
+              />
+              <IconButton onClick={handleMenu} color="inherit">
                 <Avatar
-                  sx={{ bgcolor: "#1976d2", width: 40, height: 40 }}
+                  sx={{
+                    bgcolor: theme.palette.primary.main,
+                    width: 40,
+                    height: 40,
+                  }}
                   alt={user.name || user.email || "User"}
-                  src={`https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(
-                    user.name || user.email || "User"
-                  )}`}
                 />
               </IconButton>
 
@@ -159,48 +219,108 @@ export default function MenuAppBar() {
                 anchorEl={anchorEl}
                 open={Boolean(anchorEl)}
                 onClose={handleClose}
+                PaperProps={{
+                  elevation: 3,
+                  sx: {
+                    borderRadius: 2,
+                    minWidth: 200,
+                  },
+                }}
               >
-                <MenuItem onClick={handleLogout}>Logout</MenuItem>
+                <MenuItem
+                  onClick={handleLogout}
+                  sx={{ color: theme.palette.error.main }}
+                >
+                  <ExitToAppIcon sx={{ mr: 1 }} /> Logout
+                </MenuItem>
               </Menu>
-            </div>
+            </Box>
           )}
         </Toolbar>
       </AppBar>
 
       <Box sx={{ maxWidth: "md", mx: "auto", mt: 4, p: 3 }}>
-        <Typography variant="h4" component="h1" gutterBottom align="center">
-          Admin Dashboard
+        <Typography
+          variant="h4"
+          component="h1"
+          gutterBottom
+          align="center"
+          sx={{ fontWeight: "bold", mb: 4 }}
+        >
+          Welcome to {user.name || user.email || "User"} Dashboard
         </Typography>
 
         {error && (
-          <Alert severity="error" sx={{ mb: 3 }}>
-            {error}
+          <Alert
+            severity="error"
+            sx={{ mb: 3, width: "100%", maxWidth: 600, mx: "auto" }}
+          >
+            <Typography variant="body1">{error}</Typography>
           </Alert>
         )}
 
-        <Box sx={{ display: "flex", justifyContent: "center", mb: 4 }}>
-          <Button
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            mb: 4,
+            gap: 2,
+            flexWrap: "wrap",
+            alignItems: "center",
+          }}
+        >
+          <SubmitButton
             onClick={createNewForm}
             variant="contained"
             color="primary"
             disabled={loading}
-            startIcon={loading ? <CircularProgress size={20} /> : null}
+            size="large"
+            startIcon={loading ? <CircularProgress size={24} /> : <AddIcon />}
+            sx={{
+              minWidth: 300,
+              py: 1.5,
+              fontWeight: "medium",
+              "&:hover": {
+                boxShadow: 2,
+              },
+            }}
           >
             {loading ? "Creating..." : "Generate New Feedback Form Link"}
-          </Button>
+          </SubmitButton>
 
-          <Button
+          <RefreshButton
             onClick={handleRefresh}
-            variant="outlined"
+            variant="contained"
             color="primary"
-            sx={{ ml: 2 }}
+            size="large"
             startIcon={<RefreshIcon />}
+            sx={{
+              py: 1.5,
+              fontWeight: "medium",
+              "&:hover": {
+                boxShadow: 2,
+              },
+            }}
           >
             Refresh
-          </Button>
+          </RefreshButton>
         </Box>
 
-        <Paper elevation={3} sx={{ p: 3, mb: 4 }}>
+        <Paper
+          elevation={3}
+          sx={{
+            p: 3,
+            mb: 4,
+            borderRadius: 2,
+            background: (theme) => theme.palette.background.paper,
+            borderLeft: "4px solid",
+            borderLeftColor: "primary.main",
+            "&:hover": {
+              boxShadow: (theme) => theme.shadows[6],
+            },
+            transition: "all 0.3s ease",
+          }}
+        >
           <Typography variant="h6" gutterBottom>
             Your Feedback Form Links
           </Typography>

@@ -8,6 +8,19 @@ import { toast } from "react-toastify";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useAuth } from "../ContextAPI/authContext";
+import { styled } from "@mui/material/styles";
+
+const SubmitButton = styled(Button)(({ theme }) => ({
+  marginTop: theme.spacing(3),
+  padding: theme.spacing(1.5),
+  fontWeight: "bold",
+  background: `linear-gradient(45deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
+  "&:hover": {
+    transform: "translateY(-2px)",
+    boxShadow: theme.shadows[4],
+  },
+  transition: "all 0.3s ease",
+}));
 
 const Login = () => {
   const {
@@ -66,6 +79,7 @@ const Login = () => {
         <ToastContainer position="top-center" autoClose={3000} />
         <form onSubmit={handleSubmit(onSubmit)}>
           <TextField
+            size="small"
             label="Email"
             type="email"
             fullWidth
@@ -75,6 +89,7 @@ const Login = () => {
             helperText={errors.email?.message}
           />
           <TextField
+            size="small"
             label="Password"
             type="password"
             fullWidth
@@ -87,7 +102,7 @@ const Login = () => {
             helperText={errors.password?.message}
           />
 
-          <Button
+          <SubmitButton
             type="submit"
             variant="contained"
             fullWidth
@@ -95,7 +110,7 @@ const Login = () => {
             disabled={isSubmitting}
           >
             {isSubmitting ? "Signing In..." : "Login"}
-          </Button>
+          </SubmitButton>
 
           <Typography sx={{ mt: 2, textAlign: "center" }}>
             Don't have an account?{" "}

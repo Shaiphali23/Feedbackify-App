@@ -7,8 +7,23 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useNavigate } from "react-router-dom";
+import { styled } from "@mui/material/styles";
+
+const SubmitButton = styled(Button)(({ theme }) => ({
+  marginTop: theme.spacing(3),
+  padding: theme.spacing(1.5),
+  fontWeight: "bold",
+  background: `linear-gradient(45deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
+  "&:hover": {
+    transform: "translateY(-2px)",
+    boxShadow: theme.shadows[4],
+  },
+  transition: "all 0.3s ease",
+}));
 
 const SignUp = () => {
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -41,7 +56,7 @@ const SignUp = () => {
 
       toast.success("Registration successful!");
       reset(); // Reset the form fields
-      //navigate("/dashboard");
+      navigate("/login");
     } catch (error) {
       console.error("Error:", error);
       toast.error(error.message || "An error occurred during registration");
@@ -56,6 +71,7 @@ const SignUp = () => {
         <ToastContainer position="top-center" autoClose={3000} />
         <form onSubmit={handleSubmit(onSubmit)}>
           <TextField
+            size="small"
             label="Name"
             fullWidth
             margin="normal"
@@ -64,6 +80,7 @@ const SignUp = () => {
             helperText={errors.name?.message}
           />
           <TextField
+            size="small"
             label="Email"
             type="email"
             fullWidth
@@ -79,6 +96,7 @@ const SignUp = () => {
             helperText={errors.email?.message}
           />
           <TextField
+            size="small"
             label="Password"
             type="password"
             fullWidth
@@ -92,6 +110,7 @@ const SignUp = () => {
           />
 
           <TextField
+            size="small"
             select
             label="Role"
             fullWidth
@@ -109,7 +128,7 @@ const SignUp = () => {
             <MenuItem value="reader">Reader</MenuItem>
           </TextField>
 
-          <Button
+          <SubmitButton
             type="submit"
             variant="contained"
             fullWidth
@@ -117,7 +136,7 @@ const SignUp = () => {
             disabled={isSubmitting}
           >
             {isSubmitting ? "Signing Up..." : "Sign Up"}
-          </Button>
+          </SubmitButton>
 
           <Typography sx={{ mt: 2, textAlign: "center" }}>
             Already have an account?{" "}
