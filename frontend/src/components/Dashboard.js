@@ -12,7 +12,6 @@ import {
   Button,
   CircularProgress,
   Alert,
-  Snackbar,
   List,
   ListItem,
   ListItemText,
@@ -30,6 +29,8 @@ import FeedbackChart from "./FeedbackChart";
 import FeedbackList from "./FeedbackList";
 import AddIcon from "@mui/icons-material/Add";
 import { styled } from "@mui/material/styles";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const SubmitButton = styled(Button)(({ theme }) => ({
   marginTop: theme.spacing(3),
@@ -41,8 +42,8 @@ const SubmitButton = styled(Button)(({ theme }) => ({
     boxShadow: theme.shadows[4],
   },
   transition: "all 0.3s ease",
-  [theme.breakpoints.down('sm')]: {
-    width: '100%',
+  [theme.breakpoints.down("sm")]: {
+    width: "100%",
   },
 }));
 
@@ -56,8 +57,8 @@ const RefreshButton = styled(Button)(({ theme }) => ({
     boxShadow: theme.shadows[4],
   },
   transition: "all 0.3s ease",
-  [theme.breakpoints.down('sm')]: {
-    width: '100%',
+  [theme.breakpoints.down("sm")]: {
+    width: "100%",
   },
 }));
 
@@ -73,20 +74,18 @@ export default function MenuAppBar() {
   const [feedbackData, setFeedbackData] = useState([]);
   const [error, setError] = useState(null);
   const [refreshCount, setRefreshCount] = useState(0);
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
-  
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const isTablet = useMediaQuery(theme.breakpoints.down('md'));
+
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   // Menu handlers
   const handleMenu = (event) => setAnchorEl(event.currentTarget);
-  const handleMobileMenuOpen = (event) => setMobileMoreAnchorEl(event.currentTarget);
+  const handleMobileMenuOpen = (event) =>
+    setMobileMoreAnchorEl(event.currentTarget);
   const handleClose = () => {
     setAnchorEl(null);
     setMobileMoreAnchorEl(null);
   };
-  
+
   const handleLogout = () => {
     handleClose();
     logout?.() || navigate("/login");
@@ -110,10 +109,21 @@ export default function MenuAppBar() {
           (form) => `${window.location.origin}/form/${form.formId}`
         );
         setFormLinks(links);
-        setSnackbarMessage("Feedback data updated");
-        setSnackbarOpen(true);
+        // toast.success("Feedback data updated successfully", {
+        //   position: "top-center",
+        //   autoClose: 3000,
+        //   hideProgressBar: false,
+        //   closeOnClick: true,
+        //   pauseOnHover: true,
+        //   draggable: true,
+        //   theme: "colored",
+        // });
       }
     } catch (err) {
+      // toast.error(err.message || "Failed to fetch feedback data", {
+      //   position: "top-center",
+      //   theme: "colored",
+      // });
       setError(err.message);
     } finally {
       setLoading(false);
@@ -144,9 +154,20 @@ export default function MenuAppBar() {
 
       setFormLinks((prev) => [...prev, data.formLink]);
       await fetchFeedback();
-      setSnackbarMessage("New form created successfully");
-      setSnackbarOpen(true);
+      toast.success("New feedback form created successfully", {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "colored",
+      });
     } catch (err) {
+      toast.error(err.message || "Failed to create form", {
+        position: "top-center",
+        theme: "colored",
+      });
       setError(err.message);
     } finally {
       setLoading(false);
@@ -156,6 +177,11 @@ export default function MenuAppBar() {
   // Manual refresh
   const handleRefresh = () => {
     setRefreshCount((prev) => prev + 1);
+    toast.info("Refreshing data...", {
+      position: "top-center",
+      autoClose: 1000,
+      theme: "colored",
+    });
   };
 
   // Set up event listener for feedback submissions
@@ -182,9 +208,9 @@ export default function MenuAppBar() {
   const renderMobileMenu = (
     <Menu
       anchorEl={mobileMoreAnchorEl}
-      anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      anchorOrigin={{ vertical: "top", horizontal: "right" }}
       keepMounted
-      transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+      transformOrigin={{ vertical: "top", horizontal: "right" }}
       open={Boolean(mobileMoreAnchorEl)}
       onClose={handleClose}
       PaperProps={{
@@ -198,7 +224,7 @@ export default function MenuAppBar() {
       <MenuItem>
         <Chip
           label={user.name || user.email || "User"}
-          sx={{ mr: 2, fontWeight: 600, width: '100%' }}
+          sx={{ mr: 2, fontWeight: 600, width: "100%" }}
           avatar={
             <Avatar
               sx={{ bgcolor: theme.palette.primary.main }}
@@ -211,10 +237,7 @@ export default function MenuAppBar() {
         />
       </MenuItem>
       <Divider />
-      <MenuItem
-        onClick={handleLogout}
-        sx={{ color: theme.palette.error.main }}
-      >
+      <MenuItem onClick={handleLogout} sx={{ color: theme.palette.error.main }}>
         <ExitToAppIcon sx={{ mr: 1 }} /> Logout
       </MenuItem>
     </Menu>
@@ -229,6 +252,19 @@ export default function MenuAppBar() {
         backgroundColor: theme.palette.background.default,
       }}
     >
+      <ToastContainer
+        position="top-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
+
       <AppBar
         position="sticky"
         elevation={1}
@@ -236,9 +272,9 @@ export default function MenuAppBar() {
       >
         <Toolbar sx={{ justifyContent: "space-between" }}>
           <Box sx={{ display: "flex", alignItems: "center" }}>
-            <IconButton 
-              size="large" 
-              edge="start" 
+            <IconButton
+              size="large"
+              edge="start"
               sx={{ mr: 2 }}
               onClick={isMobile ? handleMobileMenuOpen : null}
             >
@@ -247,10 +283,10 @@ export default function MenuAppBar() {
             <Typography
               variant={isMobile ? "h6" : "h5"}
               component="div"
-              sx={{ 
-                fontWeight: 700, 
+              sx={{
+                fontWeight: 700,
                 color: theme.palette.text.primary,
-                fontSize: isMobile ? '1.1rem' : '1.5rem'
+                fontSize: isMobile ? "1.1rem" : "1.5rem",
               }}
               noWrap
             >
@@ -259,7 +295,9 @@ export default function MenuAppBar() {
           </Box>
 
           {user && (
-            <Box sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: "center" }}>
+            <Box
+              sx={{ display: { xs: "none", sm: "flex" }, alignItems: "center" }}
+            >
               {!isMobile && (
                 <Chip
                   label={user.name || user.email || "User"}
@@ -307,7 +345,7 @@ export default function MenuAppBar() {
               </Menu>
             </Box>
           )}
-          
+
           {isMobile && (
             <IconButton
               size="large"
@@ -329,26 +367,28 @@ export default function MenuAppBar() {
           )}
         </Toolbar>
       </AppBar>
-      
+
       {isMobile && renderMobileMenu}
 
-      <Box sx={{ 
-        maxWidth: "md", 
-        mx: "auto", 
-        mt: 4, 
-        p: isMobile ? 1 : 3,
-        width: '100%'
-      }}>
+      <Box
+        sx={{
+          maxWidth: "md",
+          mx: "auto",
+          mt: 4,
+          p: isMobile ? 1 : 3,
+          width: "100%",
+        }}
+      >
         <Typography
           variant={isMobile ? "h5" : "h4"}
           component="h1"
           gutterBottom
           align="center"
-          sx={{ 
-            fontWeight: "bold", 
+          sx={{
+            fontWeight: "bold",
             mb: 4,
             px: isMobile ? 1 : 0,
-            fontSize: isMobile ? '1.5rem' : '2.125rem'
+            fontSize: isMobile ? "1.5rem" : "2.125rem",
           }}
         >
           Welcome to {user.name || user.email || "User"} Dashboard
@@ -357,12 +397,12 @@ export default function MenuAppBar() {
         {error && (
           <Alert
             severity="error"
-            sx={{ 
-              mb: 3, 
-              width: "100%", 
-              maxWidth: 600, 
+            sx={{
+              mb: 3,
+              width: "100%",
+              maxWidth: 600,
               mx: "auto",
-              fontSize: isMobile ? '0.875rem' : '1rem'
+              fontSize: isMobile ? "0.875rem" : "1rem",
             }}
           >
             <Typography variant="body1">{error}</Typography>
@@ -377,8 +417,8 @@ export default function MenuAppBar() {
             gap: 2,
             flexWrap: "wrap",
             alignItems: "center",
-            flexDirection: isMobile ? 'column' : 'row',
-            width: '100%'
+            flexDirection: isMobile ? "column" : "row",
+            width: "100%",
           }}
         >
           <SubmitButton
@@ -389,7 +429,7 @@ export default function MenuAppBar() {
             size="large"
             startIcon={loading ? <CircularProgress size={24} /> : <AddIcon />}
             sx={{
-              minWidth: isMobile ? '100%' : 300,
+              minWidth: isMobile ? "100%" : 300,
               py: 1.5,
               fontWeight: "medium",
               "&:hover": {
@@ -412,7 +452,7 @@ export default function MenuAppBar() {
               "&:hover": {
                 boxShadow: 2,
               },
-              minWidth: isMobile ? '100%' : 'auto',
+              minWidth: isMobile ? "100%" : "auto",
             }}
           >
             Refresh
@@ -453,8 +493,8 @@ export default function MenuAppBar() {
                         style={{
                           color: "#1976d2",
                           textDecoration: "underline",
-                          wordBreak: 'break-all',
-                          fontSize: isMobile ? '0.875rem' : '1rem'
+                          wordBreak: "break-all",
+                          fontSize: isMobile ? "0.875rem" : "1rem",
                         }}
                       >
                         {link}
@@ -468,19 +508,12 @@ export default function MenuAppBar() {
         </Paper>
 
         <FeedbackChart feedbackData={feedbackData} isMobile={isMobile} />
-        <FeedbackList feedbackData={feedbackData} onRefresh={handleRefresh} isMobile={isMobile} />
+        <FeedbackList
+          feedbackData={feedbackData}
+          onRefresh={handleRefresh}
+          isMobile={isMobile}
+        />
       </Box>
-
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={3000}
-        onClose={() => setSnackbarOpen(false)}
-        message={snackbarMessage}
-        anchorOrigin={{
-          vertical: isMobile ? 'bottom' : 'top',
-          horizontal: 'center'
-        }}
-      />
     </Box>
   );
 }
